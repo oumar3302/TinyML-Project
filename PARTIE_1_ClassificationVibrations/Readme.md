@@ -39,6 +39,8 @@ Les objectifs principaux sont les suivants :
 ---
 
 ## 4. Structure de la partie
+
+```text
 PARTIE_1_ClassificationVibrations/
 │
 ├── README.md
@@ -59,6 +61,7 @@ PARTIE_1_ClassificationVibrations/
 └── doc/
 └── documentation.md
 
+```
 ---
 
 ## 5. Étape 1 – Génération et collecte des données

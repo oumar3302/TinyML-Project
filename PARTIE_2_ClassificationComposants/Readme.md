@@ -46,6 +46,8 @@ Les composants utilisées pour les données de l'entrainement et à classifier s
 ---
 
 ## 5. Structure de la partie
+
+```text
 PARTIE_2_ClassificationComposants/
 │
 ├── README.md
@@ -66,6 +68,8 @@ PARTIE_2_ClassificationComposants/
 │ └── results.md
 │
 └── documentation.md
+
+```
 ---
 
 ## 6. Étape 1 – Projet Edge Impulse

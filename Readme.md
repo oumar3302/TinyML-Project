@@ -98,6 +98,6 @@ Projet réalisé dans le cadre du module **Instrumentation 3 – TinyML**,
 Université / École d’ingénieur.
 
 
-Réalisé: *** FALL Papa Oumar ***
+Réalisé par : *** FALL Papa Oumar ***
 Session: 2025/2026
 

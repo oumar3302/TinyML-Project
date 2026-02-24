@@ -57,11 +57,15 @@ le lien du dashboard: http://localhost:1880/ui
 ---
 
 # 📁 Contenu du dossier
+
+```text
 3-NodeRED/
 │
 ├── flows.json   # Flow Node-RED exporté
 └── README.md    # Documentation de la partie Node-RED
 └── dashboard
+
+```
 
 Le fichier flows.json contient l’ensemble des nœuds nécessaires au fonctionnement du système et permet de recharger le flow dans un autre environnement Node-RED.
 

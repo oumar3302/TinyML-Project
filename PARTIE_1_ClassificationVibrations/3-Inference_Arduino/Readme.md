@@ -16,11 +16,15 @@ Exécution du modèle TensorFlow Lite Micro quantifié en INT8
 Affichage de la classe de vibration prédite via le port série
 
 📁 Contenu du dossier
+
+```text
 3-Inference_Arduino/
 │
 ├── inference_vibrations.ino
 ├── vibration_model.h
 └── README.md
+
+```
 
 ⚙️ Prétraitement des données
 
