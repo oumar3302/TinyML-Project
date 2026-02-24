@@ -25,6 +25,8 @@ Ce projet vise à permettre aux étudiants de :
 ## 🧩 Organisation du projet
 
 Le dépôt est structuré comme suit :
+
+```text
 TinyML_project/
 │
 ├── README.md
