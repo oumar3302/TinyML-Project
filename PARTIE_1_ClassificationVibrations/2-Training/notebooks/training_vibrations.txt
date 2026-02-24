@@ -1,0 +1,569 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "386b8e58",
+   "metadata": {},
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 134,
+   "id": "49dff07f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ax</th>\n",
+       "      <th>ay</th>\n",
+       "      <th>az</th>\n",
+       "      <th>label</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>-0.448608</td>\n",
+       "      <td>-0.027222</td>\n",
+       "      <td>0.870483</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-0.449707</td>\n",
+       "      <td>-0.029785</td>\n",
+       "      <td>0.871460</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>-0.449341</td>\n",
+       "      <td>-0.031982</td>\n",
+       "      <td>0.864502</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>-0.453003</td>\n",
+       "      <td>-0.034424</td>\n",
+       "      <td>0.864502</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>-0.453125</td>\n",
+       "      <td>-0.032959</td>\n",
+       "      <td>0.864868</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         ax        ay        az  label\n",
+       "0 -0.448608 -0.027222  0.870483      0\n",
+       "1 -0.449707 -0.029785  0.871460      0\n",
+       "2 -0.449341 -0.031982  0.864502      0\n",
+       "3 -0.453003 -0.034424  0.864502      0\n",
+       "4 -0.453125 -0.032959  0.864868      0"
+      ]
+     },
+     "execution_count": 134,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "df0 = pd.read_csv(\"../dataset/vibration_0.csv\")\n",
+    "df1 = pd.read_csv(\"../dataset/vibration_1.csv\")\n",
+    "df2 = pd.read_csv(\"../dataset/vibration_2.csv\")\n",
+    "\n",
+    "data = pd.concat([df0, df1, df2], ignore_index=True)\n",
+    "data.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 135,
+   "id": "0f4126d1",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(59, 100, 3) (59,)\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "WINDOW_SIZE = 100\n",
+    "STEP = 50\n",
+    "\n",
+    "def create_windows(df):\n",
+    "    X = []\n",
+    "    y = []\n",
+    "\n",
+    "    for start in range(0, len(df) - WINDOW_SIZE, STEP):\n",
+    "        window = df.iloc[start:start + WINDOW_SIZE]\n",
+    "        X.append(window[['ax', 'ay', 'az']].values)\n",
+    "        y.append(window['label'].mode()[0])\n",
+    "\n",
+    "    return np.array(X), np.array(y)\n",
+    "\n",
+    "X, y = create_windows(data)\n",
+    "print(X.shape, y.shape)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1f538e13",
+   "metadata": {
+    "slideshow": {
+     "slide_type": "notes"
+    }
+   },
+   "source": [
+    "from sklearn.preprocessing import StandardScaler\n",
+    "\n",
+    "X_reshaped = X.reshape(-1, 3)\n",
+    "scaler = StandardScaler()\n",
+    "X_scaled = scaler.fit_transform(X_reshaped)\n",
+    "X_scaled = X_scaled.reshape(X.shape)\n",
+    "\n",
+    "mean = scaler.mean_\n",
+    "std = scaler.scale_\n",
+    "\n",
+    "print(\"mean:\", mean)\n",
+    "print(\"std:\", std)\n",
+    "\n",
+    "#mean: [-0.15400744 -0.0554164   0.26230029]\n",
+    "#std: [0.22510172 0.0655809  0.92033036]\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dff8c7e6",
+   "metadata": {},
+   "source": [
+    "import tensorflow as tf\n",
+    "from tensorflow.keras.models import Sequential\n",
+    "from tensorflow.keras.layers import Dense, Flatten\n",
+    "\n",
+    "model = Sequential([\n",
+    "    Flatten(input_shape=(100, 3)),\n",
+    "    Dense(32, activation='relu'),\n",
+    "    Dense(16, activation='relu'),\n",
+    "    Dense(3, activation='softmax')\n",
+    "])\n",
+    "\n",
+    "model.compile(\n",
+    "    optimizer='adam',\n",
+    "    loss='sparse_categorical_crossentropy',\n",
+    "    metrics=['accuracy']\n",
+    ")\n",
+    "\n",
+    "model.summary()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 136,
+   "id": "0d7b7f98",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "c:\\Users\\papao\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\keras\\src\\layers\\reshaping\\flatten.py:37: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.\n",
+      "  super().__init__(**kwargs)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Epoch 1/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 40ms/step - accuracy: 0.9661 - loss: 0.9949\n",
+      "Epoch 2/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 32ms/step - accuracy: 0.9661 - loss: 0.9317\n",
+      "Epoch 3/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 34ms/step - accuracy: 0.9661 - loss: 0.8794\n",
+      "Epoch 4/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 43ms/step - accuracy: 0.9661 - loss: 0.8296\n",
+      "Epoch 5/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 38ms/step - accuracy: 0.9661 - loss: 0.7868 \n",
+      "Epoch 6/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 46ms/step - accuracy: 0.9661 - loss: 0.7461\n",
+      "Epoch 7/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 45ms/step - accuracy: 0.8475 - loss: 0.7130\n",
+      "Epoch 8/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 34ms/step - accuracy: 0.9831 - loss: 0.6776\n",
+      "Epoch 9/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 41ms/step - accuracy: 0.9831 - loss: 0.6449\n",
+      "Epoch 10/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 36ms/step - accuracy: 0.9831 - loss: 0.6152\n",
+      "Epoch 11/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 39ms/step - accuracy: 0.9831 - loss: 0.5878\n",
+      "Epoch 12/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 46ms/step - accuracy: 0.9831 - loss: 0.5630 \n",
+      "Epoch 13/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 39ms/step - accuracy: 0.9831 - loss: 0.5400 \n",
+      "Epoch 14/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 68ms/step - accuracy: 0.9831 - loss: 0.5178\n",
+      "Epoch 15/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 64ms/step - accuracy: 0.9831 - loss: 0.4976 \n",
+      "Epoch 16/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 48ms/step - accuracy: 0.9831 - loss: 0.4773 \n",
+      "Epoch 17/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 61ms/step - accuracy: 0.9831 - loss: 0.4575 \n",
+      "Epoch 18/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 31ms/step - accuracy: 0.9831 - loss: 0.4391\n",
+      "Epoch 19/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 45ms/step - accuracy: 0.9831 - loss: 0.4212\n",
+      "Epoch 20/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 53ms/step - accuracy: 0.9831 - loss: 0.4049\n",
+      "Epoch 21/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 41ms/step - accuracy: 1.0000 - loss: 0.3872\n",
+      "Epoch 22/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 48ms/step - accuracy: 1.0000 - loss: 0.3698 \n",
+      "Epoch 23/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 57ms/step - accuracy: 1.0000 - loss: 0.3534\n",
+      "Epoch 24/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 45ms/step - accuracy: 1.0000 - loss: 0.3370\n",
+      "Epoch 25/25\n",
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 69ms/step - accuracy: 1.0000 - loss: 0.3210 \n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "<keras.src.callbacks.history.History at 0x287b27e6a10>"
+      ]
+     },
+     "execution_count": 136,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import tensorflow as tf\n",
+    "import numpy as np\n",
+    "from tensorflow.keras.models import Sequential\n",
+    "from tensorflow.keras.layers import Dense, Flatten\n",
+    "\n",
+    "# X shape: (N, 100, 3), en g\n",
+    "X_norm = X / 4.0\n",
+    "\n",
+    "model = tf.keras.Sequential([\n",
+    "    tf.keras.layers.Flatten(input_shape=(100, 3)),\n",
+    "    tf.keras.layers.Dense(16, activation='relu'),\n",
+    "    tf.keras.layers.Dense(3, activation='softmax')\n",
+    "])\n",
+    "\n",
+    "model.compile(\n",
+    "    optimizer='adam',\n",
+    "    loss='sparse_categorical_crossentropy',\n",
+    "    metrics=['accuracy']\n",
+    ")\n",
+    "\n",
+    "model.fit(X_norm, y, epochs=25, batch_size=32)\n",
+    " "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "91954312",
+   "metadata": {},
+   "source": [
+    "#model.fit(X_scaled, y, epochs=20, batch_size=32, validation_split=0.2)\n",
+    "def to_c_array(name, arr):\n",
+    "    print(f\"const float {name}[{len(arr)}] = {{\")\n",
+    "    for i in range(0, len(arr), 6):\n",
+    "        line = \", \".join(f\"{v:.6f}f\" for v in arr[i:i+6])\n",
+    "        print(\"  \" + line + \",\")\n",
+    "    print(\"};\")\n",
+    "\n",
+    "to_c_array(\"scaler_mean\", mean)\n",
+    "to_c_array(\"scaler_std\", std)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 137,
+   "id": "cc54c368",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\u001b[1m2/2\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 37ms/step - accuracy: 1.0000 - loss: 0.0087 \n",
+      "Accuracy globale : 1.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "loss, acc = model.evaluate(X_scaled, y)\n",
+    "print(\"Accuracy globale :\", acc)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3ee964c1",
+   "metadata": {},
+   "source": [
+    "# converter = tf.lite.TFLiteConverter.from_keras_model(model)\n",
+    "# tflite_model = converter.convert()\n",
+    "\n",
+    "\n",
+    "\n",
+    "converter = tf.lite.TFLiteConverter.from_keras_model(model)\n",
+    "converter.optimizations = [tf.lite.Optimize.DEFAULT]\n",
+    "\n",
+    "# Dataset représentatif (obligatoire pour INT8 propre)\n",
+    "def representative_dataset():\n",
+    "    # X_scaled est ton entrée après StandardScaler (forme: [N, 100, 3])\n",
+    "    # Prends quelques centaines d'exemples\n",
+    "    for i in range(300):\n",
+    "        sample = X_scaled[i:i+1].astype(np.float32)\n",
+    "        yield [sample]\n",
+    "\n",
+    "converter.representative_dataset = representative_dataset\n",
+    "\n",
+    "# Forcer du INT8 partout (op + I/O)\n",
+    "converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]\n",
+    "converter.inference_input_type = tf.int8\n",
+    "converter.inference_output_type = tf.int8\n",
+    "\n",
+    "tflite_model = converter.convert()\n",
+    "\n",
+    "with open(\"../models/vibration_model_int8.tflite\", \"wb\") as f:\n",
+    "    f.write(tflite_model)\n",
+    "\n",
+    "print(\"Taille tflite int8:\", len(tflite_model), \"bytes\")\n",
+    "\n",
+    "\n",
+    "\n",
+    "#with open(\"../models/vibration_model.tflite\", \"wb\") as f:\n",
+    " #   f.write(tflite_model)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 138,
+   "id": "30d52354",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "INFO:tensorflow:Assets written to: C:\\Users\\papao\\AppData\\Local\\Temp\\tmphqt61dnp\\assets\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "INFO:tensorflow:Assets written to: C:\\Users\\papao\\AppData\\Local\\Temp\\tmphqt61dnp\\assets\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Saved artifact at 'C:\\Users\\papao\\AppData\\Local\\Temp\\tmphqt61dnp'. The following endpoints are available:\n",
+      "\n",
+      "* Endpoint 'serve'\n",
+      "  args_0 (POSITIONAL_ONLY): TensorSpec(shape=(None, 100, 3), dtype=tf.float32, name='keras_tensor_80')\n",
+      "Output Type:\n",
+      "  TensorSpec(shape=(None, 3), dtype=tf.float32, name=None)\n",
+      "Captures:\n",
+      "  2781818179952: TensorSpec(shape=(), dtype=tf.resource, name=None)\n",
+      "  2781838534864: TensorSpec(shape=(), dtype=tf.resource, name=None)\n",
+      "  2781838531696: TensorSpec(shape=(), dtype=tf.resource, name=None)\n",
+      "  2781838531872: TensorSpec(shape=(), dtype=tf.resource, name=None)\n",
+      "Taille: 8328 bytes\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "c:\\Users\\papao\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\tensorflow\\lite\\python\\convert.py:863: UserWarning: Statistics for quantized inputs were expected, but not specified; continuing anyway.\n",
+      "  warnings.warn(\n"
+     ]
+    }
+   ],
+   "source": [
+    "converter = tf.lite.TFLiteConverter.from_keras_model(model)\n",
+    "converter.optimizations = [tf.lite.Optimize.DEFAULT]\n",
+    "\n",
+    "def representative_dataset():\n",
+    "    for i in range(200):\n",
+    "        yield [(X_norm[i:i+1]).astype(np.float32)]\n",
+    "\n",
+    "converter.representative_dataset = representative_dataset\n",
+    "converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]\n",
+    "converter.inference_input_type = tf.int8\n",
+    "converter.inference_output_type = tf.int8\n",
+    "\n",
+    "tflite_model = converter.convert()\n",
+    "\n",
+    "with open(\"vibration_model_int8.tflite\", \"wb\") as f:\n",
+    "    f.write(tflite_model)\n",
+    "\n",
+    "print(\"Taille:\", len(tflite_model), \"bytes\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 139,
+   "id": "2acab05d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Racine projet : c:\\Users\\papao\\Downloads\\Github-projet\\PARTIE_1_ClassificationVibrations\n",
+      "TFLite path : c:\\Users\\papao\\Downloads\\Github-projet\\PARTIE_1_ClassificationVibrations\\2-Training\\notebooks\\vibration_model_int8.tflite\n",
+      "Header path : c:\\Users\\papao\\Downloads\\Github-projet\\PARTIE_1_ClassificationVibrations\\3-Inference_Arduino\\inference_vibrations\\vibration_model.h\n",
+      "🔄 Conversion du modèle en fichier header C++...\n",
+      "✅ Fichier header créé avec succès !\n",
+      "📄 Taille du fichier vibration_model.h : 52,292 bytes (51.07 KB)\n",
+      "\n",
+      "📋 Prochaines étapes :\n",
+      "   1. Ouvrez le fichier model.h dans votre éditeur\n",
+      "   2. Ajoutez-le comme onglet dans votre sketch Arduino\n",
+      "   3. Utilisez-le avec TensorFlow Lite for Microcontrollers\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "from pathlib import Path\n",
+    "\n",
+    "# ==========================\n",
+    "# DÉFINIR LA RACINE DU PROJET\n",
+    "# ==========================\n",
+    "PROJECT_ROOT = Path.cwd().parents[1]\n",
+    "\n",
+    "print(\"Racine projet :\", PROJECT_ROOT)\n",
+    "\n",
+    "# ==========================\n",
+    "# CHEMINS ABSOLUS\n",
+    "# ==========================\n",
+    "tflite_path = PROJECT_ROOT / \"2-Training\" / \"notebooks\" / \"vibration_model_int8.tflite\"\n",
+    "header_path = PROJECT_ROOT / \"3-Inference_Arduino\" / \"inference_vibrations\" / \"vibration_model.h\"\n",
+    "\n",
+    "print(\"TFLite path :\", tflite_path)\n",
+    "print(\"Header path :\", header_path)\n",
+    "\n",
+    "\n",
+    "# ============================================\n",
+    "# CONVERSION EN FICHIER HEADER C++\n",
+    "# ============================================\n",
+    "\n",
+    "def convert_tflite_to_header(tflite_file, header_file):\n",
+    "    \"\"\"\n",
+    "    Convertit un fichier TFLite en fichier header C++ compatible Arduino.\n",
+    "    \n",
+    "    Le modèle binaire est converti en un tableau de bytes hexadécimaux\n",
+    "    qui peut être inclus directement dans le code Arduino.\n",
+    "    \"\"\"\n",
+    "    # Lire le fichier TFLite (mode binaire)\n",
+    "    with open(tflite_file, 'rb') as f:\n",
+    "        tflite_data = f.read()\n",
+    "    \n",
+    "    # Créer le fichier header C++\n",
+    "    with open(header_file, 'w', encoding='utf-8') as f:\n",
+    "        # En-tête du fichier\n",
+    "        f.write(\"// Modèle TensorFlow Lite pour Arduino\\n\")\n",
+    "        f.write(\"// Généré automatiquement - Ne pas modifier manuellement\\n\\n\")\n",
+    "        \n",
+    "        # Déclaration du tableau de bytes\n",
+    "        # __attribute__((aligned(4))) : Alignement sur 4 bytes pour optimiser l'accès mémoire\n",
+    "        f.write(\"const unsigned char vibration_model_tflite[] __attribute__((aligned(4))) = {\\n\")\n",
+    "        \n",
+    "        # Convertir les bytes en format hexadécimal\n",
+    "        # Format: 12 bytes par ligne pour une meilleure lisibilité\n",
+    "        for i in range(0, len(tflite_data), 12):\n",
+    "            chunk = tflite_data[i:i+12]\n",
+    "            # Convertir chaque byte en hexadécimal (0x00 à 0xFF)\n",
+    "            hex_values = ', '.join(f\"0x{b:02x}\" for b in chunk)\n",
+    "            # Ajouter une virgule sauf pour le dernier chunk\n",
+    "            comma = \",\" if i + 12 < len(tflite_data) else \"\"\n",
+    "            f.write(f\"  {hex_values}{comma}\\n\")\n",
+    "        \n",
+    "        f.write(\"};\\n\\n\")\n",
+    "        \n",
+    "        # Ajouter la longueur du modèle (utile pour certaines bibliothèques)\n",
+    "        f.write(f\"const unsigned int vibration_model_tflite_len = {len(tflite_data)};\\n\")\n",
+    "\n",
+    "# Convertir le modèle\n",
+    "print(f\"🔄 Conversion du modèle en fichier header C++...\")\n",
+    "convert_tflite_to_header(tflite_path, header_path)\n",
+    "\n",
+    "\n",
+    "# Afficher la taille du fichier généré\n",
+    "import os\n",
+    "model_h_size = os.path.getsize(header_path)\n",
+    "print(f\"✅ Fichier header créé avec succès !\")\n",
+    "print(f\"📄 Taille du fichier vibration_model.h : {model_h_size:,} bytes ({model_h_size/1024:.2f} KB)\")\n",
+    "print(f\"\\n📋 Prochaines étapes :\")\n",
+    "print(f\"   1. Ouvrez le fichier model.h dans votre éditeur\")\n",
+    "print(f\"   2. Ajoutez-le comme onglet dans votre sketch Arduino\")\n",
+    "print(f\"   3. Utilisez-le avec TensorFlow Lite for Microcontrollers\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.11"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
