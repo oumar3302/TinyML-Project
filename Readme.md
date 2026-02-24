@@ -45,6 +45,7 @@ TinyML_project/
 │ ├── 3-NodeRED/
 │ └── doc/
 
+```
 
 Chaque partie dispose de son propre code, de sa documentation et de ses ressources associées.
 ---
