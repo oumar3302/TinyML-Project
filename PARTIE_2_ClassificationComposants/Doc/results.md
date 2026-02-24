@@ -100,10 +100,10 @@ Aperçu: ![alt text](../3-NodeRED/dashboard/dashboard_screenshot.png)
 
 Exemple de résultat :
 
-Classe	Nombre détecté
-Resistor	3
-Capacitor	4
-LED	1
+Classe	Nombre détecté :
+    Resistor	3
+    Capacitor	4
+    LED	1
 
 Aperçu: ![alt text](../3-NodeRED/dashboard/dashboard_screenshot1.png)
 
