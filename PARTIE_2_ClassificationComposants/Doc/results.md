@@ -65,7 +65,67 @@ Observation : ![alt text](resis.png)
     Forte ambiguïté entre classes
 ---
 
-## 4. Analyse de robustesse
+## Visualisation temps réel avec Node-RED
+
+### 4.1 Architecture de traitement
+
+Après l’inférence embarquée (Arduino + modèle Edge Impulse), les résultats de classification sont transmis via liaison série vers Node-RED.
+
+Le flux Node-RED est structuré comme suit :
+
+compteurs → clean_payload → tri → fonctions spécifiques → dashboard
+
+Aperçu: ![alt text](../3-NodeRED/dashboard/figure-node-red.png)
+
+compteurs : récupération des données brutes envoyées par l’Arduino
+clean_payload : nettoyage et formatage du message
+tri : séparation des classes détectées
+function 1/2/3 : extraction des compteurs pour chaque composant
+Dashboard : affichage des résultats en temps réel
+
+### 4.2 Dashboard de classification
+
+Le tableau de bord affiche en temps réel :
+
+- Nombre de résistances détectées
+- Nombre de condensateurs détectés
+- Nombre de LEDs détectées
+
+🔹 État initial
+
+Tous les compteurs sont initialisés à 0.
+Aperçu: ![alt text](../3-NodeRED/dashboard/dashboard_screenshot.png)
+
+🔹 Après détection
+
+Exemple de résultat :
+
+Classe	Nombre détecté
+Resistor	3
+Capacitor	4
+LED	1
+
+Aperçu: ![alt text](../3-NodeRED/dashboard/dashboard_screenshot1.png)
+
+Le dashboard se met à jour dynamiquement à chaque nouvelle classification.
+
+### 4.3 Validation fonctionnelle
+
+Les tests réalisés montrent :
+
+- Mise à jour correcte des compteurs
+- Aucun décalage temporel visible
+- Traitement stable des messages série
+- Séparation correcte des classes
+
+L’intégration Node-RED valide donc :
+
+✔ La cohérence du pipeline TinyML
+✔ La transmission fiable des résultats
+✔ L’exploitation temps réel des données
+---
+
+## 5. Analyse de robustesse
 
 Les résultats montrent :
 
@@ -77,7 +137,7 @@ Les résultats montrent :
     L’éclairage
 ---
 
-## 5. Causes possibles des performances limitées
+## 6. Causes possibles des performances limitées
 
 Plusieurs facteurs expliquent ces résultats :
 
@@ -88,7 +148,7 @@ Plusieurs facteurs expliquent ces résultats :
 ---
 
 
-## 6. Pistes d’amélioration
+## 7. Pistes d’amélioration
 
 Pour améliorer la robustesse :
 
@@ -104,7 +164,7 @@ Pour améliorer la robustesse :
 
 - Ajuster l’architecture CNN
 
-## 7. Conclusion des tests
+## 8. Conclusion des tests
 
 Le système fonctionne correctement et réalise une classification embarquée temps réel.
 
